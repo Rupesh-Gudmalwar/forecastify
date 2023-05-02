@@ -1,5 +1,7 @@
 # Steps to run this project.
 
+## Live site : https://forecastify-rupesh.netlify.app/
+
 1. Clone the project, command will be git clone <url of repo>
 2. Install node modules and dependancies, npm i.
 3. create .env file at root level, create all variables (You might have received or contact me).
