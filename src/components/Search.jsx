@@ -2,52 +2,58 @@ import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
-import { fetchWeatherApi, geoCodingApi } from "../APIs";
+import { fetchWeatherApi, geoCodingApi, geoCodingByZipApi } from "../APIs";
 import styled from "styled-components";
 
-export default function Asynchronous() {
+export default function SearchAuto({
+  setCurrentWeather,
+  setForecast,
+  selectedCity,
+  setSelectedCity,
+  type,
+}) {
   const [options, setOptions] = useState([]);
-  const [selectedCity, setSelectedCity] = useState("");
-  const [loading, setLoading] = useState({ details: false });
-
-  console.log("selectedCity", selectedCity);
-
-  useEffect(() => {
-    selectedCity?.lat &&
-      selectedCity?.lon &&
-      fetchWeatherApi(selectedCity?.lat, selectedCity?.lon).then(({ data }) =>
-        console.log("details", data)
-      );
-  }, [selectedCity?.lat, selectedCity?.lon]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // setSearchKey(e);
-    geoCodingApi(e.target.value).then(({ data }) => {
-      const optData = data?.map((each) => ({
-        title: `${each?.name}, ${each?.state}, ${each?.country}`,
-        value: `${each?.name}, ${each?.state}, ${each?.country}`,
-        lat: each?.lat,
-        lon: each?.lon,
-      }));
-      setOptions(optData);
-      console.log("data", data);
-    });
+    if (type === "city") {
+      geoCodingApi(e.target.value)
+        .then(({ data }) => {
+          const optData = data?.map((each) => ({
+            title: `${each?.name}, ${each?.state}, ${each?.country}`,
+            value: `${each?.name}, ${each?.state}, ${each?.country}`,
+            name: each?.name,
+            lat: each?.lat,
+            lon: each?.lon,
+          }));
+          setOptions(optData);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else {
+      geoCodingByZipApi(e.target.value)
+        .then(({ data }) => {
+          console.log("asd", data);
+          const zipCity = {
+            lat: data?.coord?.lat,
+            lon: data?.coord?.lon,
+            name: data?.name,
+          };
+          setSelectedCity(zipCity);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   };
 
   return (
     <AutocompleteCustom
       id='asynchronous-demo'
-      //   open={open}
-      //   onOpen={() => {
-      //     setOpen(true);
-      //   }}
-      //   isOptionEqualToValue={(option, value) => option.title === value.title}
       getOptionLabel={(option) => option.title}
-      //   value={searchKey}
       options={options}
       onChange={(e, newValue) => {
-        console.log("asd", e, newValue);
         setSelectedCity(newValue);
       }}
       onInputChange={(e) => handleSearch(e)}
@@ -68,7 +74,6 @@ export default function Asynchronous() {
 }
 
 const AutocompleteCustom = styled(Autocomplete)`
-  width: 60vw;
+  width: 40vw;
   max-width: 50rem;
-  margin: auto;
 `;

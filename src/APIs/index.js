@@ -6,8 +6,14 @@ export const geoCodingApi = (searchKey) => {
   );
 };
 
-export const fetchWeatherApi = (lat, lon) => {
+export const geoCodingByZipApi = (zipCode, countryCode = "IN") => {
   return axios.get(
-    `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${process.env.REACT_APP_GEO_KEY}`
+    `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode},${countryCode}&appid=${process.env.REACT_APP_GEO_KEY}`
+  );
+};
+
+export const fetchWeatherApi = (lat, lon, unit) => {
+  return axios.get(
+    `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${process.env.REACT_APP_GEO_KEY}&units=${unit}`
   );
 };
